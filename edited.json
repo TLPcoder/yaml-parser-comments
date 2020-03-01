@@ -5,15 +5,18 @@
      "start": {
         "say": [
            "Hello!",
+           "Hope you are having a nice day",
            "What is your gender?"
         ],
         "choices": [
            "Male",
-           "Female"
+           "Female",
+           "Other"
         ],
         "responseMapping": {
            "male": "man_response",
-           "female": "woman_response"
+           "female": "woman_response",
+           "other": "other_response"
         }
      },
      "man_response": {
@@ -28,6 +31,12 @@
         ],
         "nextStep": "goodbye"
      },
+     "other_response": {
+      "say": [
+         "Ok, you're a other"
+      ],
+      "nextStep": "goodbye"
+   },
      "goodbye": {
         "say": [
            "Goodbye!"

@@ -4,8 +4,8 @@ steps:
   # First step, say hello
   start:
     say:
-      - "Hello!"
-      - "What is your gender?" # Ask user their gender
+      - Hello!
+      - What is your gender? # Ask user their gender
     choices:
       # Offer user two button choices, [Male] or [Female]
       - Male
@@ -17,15 +17,15 @@ steps:
   man_response:
     say:
       # Acknowledge man
-      - "Ok, you're a man"
+      - Ok, you're a man
     nextStep: goodbye # jump to goodbye
 
   woman_response:
     say:
       # Acknowledge woman
-      - "Ok, you're a woman"
+      - Ok, you're a woman
     nextStep: goodbye # jump to goodbye
   # Say goodbye:
   goodbye:
     say:
-      - "Goodbye!"
+      - Goodbye!

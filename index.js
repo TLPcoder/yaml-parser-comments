@@ -1,4 +1,5 @@
 const fs = require('fs')
+const YAML = require('js-yaml');
 
 const readFile = (path, encoding = 'utf8') => fs.readFileSync(__dirname + path, encoding)
 const writeFile = (path, data, encoding = 'utf8') => fs.writeFileSync(__dirname + path, data, encoding)
@@ -63,21 +64,32 @@ function getLine (start, end, yaml, isCur) {
   return line
 }
 
+function spaces(str) {
+  let i = 0
+  while(str[i] === ' ') i++
+  return i
+}
+
 function updatePath(path, curLine, levelChange) {
   if (!isComment(curLine)) {
       if (levelChange === 'downLevel') {
-        path.push(curLine.replace(/#.*\n/, '\n'))
+        path.push(curLine.replace(/#.*\n/, '\n').trimRight())
     }
 
     if (levelChange === 'upLevel') {
-      path.pop()
-      path.pop()
-      path.push(curLine.replace(/#.*\n/, '\n'))
+      var run = spaces(path[path.length - 1]) / spaces(curLine)
+
+      for(let i = 0; i < run; i++) {
+        path.pop()
+      }
+
+      path.push(curLine.replace(/#.*\n/, '\n').trimRight())
     }
 
     if (levelChange === 'sameLevel') {
       path.pop()
-      path.push(curLine.replace(/#.*\n/, '\n'))
+      path.push(curLine.replace(/#.*\n/, '\n').trimRight())
+      return
     }
   }
 }
@@ -135,8 +147,7 @@ const pathToComment = (yaml) => {
   return commentMapping
 }
 
-function update(yaml) {
-  const pathComments = pathToComment(yaml)
+function update(yaml, pathComments) {
   const path = []
 
   yaml = yaml.replace(/#.*/g, '').replace(/^\s*\n/gm, '');
@@ -159,9 +170,18 @@ function update(yaml) {
 
     start = bound.end
   }
-  writeFile('/newYaml.yaml', yaml)
+  return yaml
 }
 
-const yaml = readFile('/original.yaml')
 
-update(yaml)
+function JsonToYamlPreserveComments(originalYaml, newJson) {
+  const pathComments = pathToComment(originalYaml)
+  const yaml = YAML.safeDump(newJson, { noCompatMode: true })
+
+  writeFile('/newYaml.yaml', update(yaml, pathComments))
+}
+
+var yaml = readFile('/original.yaml') 
+var json = readFile('/edited.json')
+JsonToYamlPreserveComments(yaml, JSON.parse(json))
+  
