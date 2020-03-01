@@ -2,8 +2,11 @@ const fs = require('fs')
 
 const readFile = (path, encoding = 'utf8') => fs.readFileSync(__dirname + path, encoding)
 const writeFile = (path, data, encoding = 'utf8') => fs.writeFileSync(__dirname + path, data, encoding)
-// const findComments = (yaml) => yaml.match(/#.*\n/g)
-const findComments = (yaml) => {
+const isComment = (str) => str.trim().startsWith('#') 
+const isCommentInData = (str) => str.trim().replace(/#.*/, '').length > 0 ? true : false
+const containsComment = (line, comment) => line.includes(comment)
+
+function findComments(yaml) {
   const comments = []
 
   for(let i = 0; i < yaml.length; i++) {
@@ -23,9 +26,6 @@ const findComments = (yaml) => {
   }
   return comments
 }
-const isComment = (str) => str.trim().startsWith('#') 
-const isCommentInData = (str) => str.trim().replace(/#.*/, '').length > 0 ? true : false
-const containsComment = (line, comment) => line.includes(comment)
 
 function findLineBound(start, yaml) {
   let end = start
@@ -83,20 +83,23 @@ function updatePath(path, curLine, levelChange) {
 }
 
 function injectComment(yaml, path, curLine, bound, pathComments) {
-  if (pathComments.length && JSON.stringify(path) === JSON.stringify(pathComments[0].path)) {
-    const { comment, commentInData } = pathComments.shift()
-    if (commentInData) {
-      yaml = yaml.slice(0, bound.end - curLine.length) + curLine.replace(/\n/, '') + comment + yaml.slice(bound.end)
-      bound.end = bound.end + ((curLine.replace(/\n/, '') + comment).length - curLine.length)
-      return injectComment(yaml, path, curLine, bound, pathComments)
+  pathComments.map((pathComment, i) => {
+    if (JSON.stringify(path) === JSON.stringify(pathComment.path)) {
+      pathComments.splice(i, 1)
+      const { comment, commentInData } = pathComment
+      if (commentInData) {
+        yaml = yaml.slice(0, bound.end - curLine.length) + curLine.replace(/\n/, '') + comment + yaml.slice(bound.end)
+        bound.end = bound.end + ((curLine.replace(/\n/, '') + comment).length - curLine.length)
+        yaml = injectComment(yaml, path, curLine, bound, pathComments)
+      }
+      else {
+        yaml = yaml.slice(0, bound.end) + comment + yaml.slice(bound.end)
+        yaml = injectComment(yaml, path, curLine, bound, pathComments)
+      }
     }
-    else {
-      yaml = yaml.slice(0, bound.end) + comment + yaml.slice(bound.end)
-      return injectComment(yaml, path, curLine, bound, pathComments)
-    }
-  } else {
-    return yaml
-  }
+  })
+
+  return yaml
 }
 
 const pathToComment = (yaml) => {
