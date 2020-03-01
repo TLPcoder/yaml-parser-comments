@@ -1,0 +1,37 @@
+{
+  "flowName": "introduction",
+  "firstStep": "start",
+  "steps": {
+     "start": {
+        "say": [
+           "Hello!",
+           "What is your gender?"
+        ],
+        "choices": [
+           "Male",
+           "Female"
+        ],
+        "responseMapping": {
+           "male": "man_response",
+           "female": "woman_response"
+        }
+     },
+     "man_response": {
+        "say": [
+           "Ok, you're a man"
+        ],
+        "nextStep": "goodbye"
+     },
+     "woman_response": {
+        "say": [
+           "Ok, you're a woman"
+        ],
+        "nextStep": "goodbye"
+     },
+     "goodbye": {
+        "say": [
+           "Goodbye!"
+        ]
+     }
+  }
+}
