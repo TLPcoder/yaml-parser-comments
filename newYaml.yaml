@@ -23,8 +23,8 @@ steps:
     say:
       # Acknowledge woman
       - "Ok, you're a woman"
-    nextStep: goodbye    # Say goodbye:
-# jump to goodbye
+    nextStep: goodbye  # jump to goodbye
+  # Say goodbye:
   goodbye:
     say:
       - "Goodbye!"

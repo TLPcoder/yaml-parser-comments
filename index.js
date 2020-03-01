@@ -87,7 +87,7 @@ function injectComment(yaml, path, curLine, bound, pathComments) {
     const { comment, commentInData } = pathComments.shift()
     if (commentInData) {
       yaml = yaml.slice(0, bound.end - curLine.length) + curLine.replace(/\n/, '') + comment + yaml.slice(bound.end)
-      // bound.end = bound.end + ((curLine.replace(/\n/, '') + comment).length - curLine.length)
+      bound.end = bound.end + ((curLine.replace(/\n/, '') + comment).length - curLine.length)
       return injectComment(yaml, path, curLine, bound, pathComments)
     }
     else {
@@ -105,7 +105,7 @@ const pathToComment = (yaml) => {
   const path = []
   let start = 0
 
-  while(comments.length) {
+  while(start < yaml.length) {
     let bound = findLineBound(start, yaml)
     let curLine = getLine(bound.start, bound.end, yaml, true)
   
@@ -140,7 +140,7 @@ function update(yaml) {
 
   let start = 0
 
-  while(pathComments.length) {
+  while(start < yaml.length) {
     let bound = findLineBound(start, yaml)
     let curLine = getLine(bound.start, bound.end, yaml, true)
 
