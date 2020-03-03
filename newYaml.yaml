@@ -6,7 +6,7 @@ steps:
     say:
       - Hello!
       - Hope you are having a nice day
-      - What is your gender? # Ask user their gender
+      - What "is" your gender? # Ask user their gender
     choices:
       # Offer user two button choices, [Male] or [Female]
       - Male
@@ -14,7 +14,7 @@ steps:
       - Other
     responseMapping:
       # Based on the user's response jump to man_response, or woman_response
-      male: man_response
+      male: man_response # testing comment
       female: woman_response
       other: other_response
   man_response:

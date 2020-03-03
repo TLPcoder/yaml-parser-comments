@@ -6,7 +6,7 @@
         "say": [
            "Hello!",
            "Hope you are having a nice day",
-           "What is your gender?"
+           "What \"is\" your gender?"
         ],
         "choices": [
            "Male",

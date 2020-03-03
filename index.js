@@ -6,6 +6,7 @@ const writeFile = (path, data, encoding = 'utf8') => fs.writeFileSync(__dirname 
 const isComment = (str) => str.trim().startsWith('#') 
 const isCommentInData = (str) => str.trim().replace(/#.*/, '').length > 0 ? true : false
 const containsComment = (line, comment) => line.includes(comment)
+const normPath = (p) => p.replace(/#.*\n/, '\n').replace(/"/g, '').trimRight()
 
 function findComments(yaml) {
   const comments = []
@@ -73,7 +74,7 @@ function spaces(str) {
 function updatePath(path, curLine, levelChange) {
   if (!isComment(curLine)) {
       if (levelChange === 'downLevel') {
-        path.push(curLine.replace(/#.*\n/, '\n').trimRight())
+        path.push(normPath(curLine))
     }
 
     if (levelChange === 'upLevel') {
@@ -83,12 +84,12 @@ function updatePath(path, curLine, levelChange) {
         path.pop()
       }
 
-      path.push(curLine.replace(/#.*\n/, '\n').trimRight())
+      path.push(normPath(curLine))
     }
 
     if (levelChange === 'sameLevel') {
       path.pop()
-      path.push(curLine.replace(/#.*\n/, '\n').trimRight())
+      path.push(normPath(curLine))
       return
     }
   }
@@ -98,7 +99,9 @@ function injectComment(yaml, path, curLine, bound, pathComments) {
   pathComments.map((pathComment, i) => {
     if (JSON.stringify(path) === JSON.stringify(pathComment.path)) {
       pathComments.splice(i, 1)
+
       const { comment, commentInData } = pathComment
+
       if (commentInData) {
         yaml = yaml.slice(0, bound.end - curLine.length) + curLine.replace(/\n/, '') + comment + yaml.slice(bound.end)
         bound.end = bound.end + ((curLine.replace(/\n/, '') + comment).length - curLine.length)
@@ -108,6 +111,7 @@ function injectComment(yaml, path, curLine, bound, pathComments) {
         yaml = yaml.slice(0, bound.end) + comment + yaml.slice(bound.end)
         yaml = injectComment(yaml, path, curLine, bound, pathComments)
       }
+
     }
   })
 
@@ -176,12 +180,13 @@ function update(yaml, pathComments) {
 
 function JsonToYamlPreserveComments(originalYaml, newJson) {
   const pathComments = pathToComment(originalYaml)
-  const yaml = YAML.safeDump(newJson, { noCompatMode: true })
+  const yaml = YAML.safeDump(newJson)
 
   writeFile('/newYaml.yaml', update(yaml, pathComments))
 }
 
-var yaml = readFile('/original.yaml') 
-var json = readFile('/edited.json')
+const yaml = readFile('/original.yaml') 
+const json = readFile('/edited.json')
+
 JsonToYamlPreserveComments(yaml, JSON.parse(json))
   
