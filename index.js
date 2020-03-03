@@ -185,4 +185,3 @@ function JsonToYamlPreserveComments(originalYaml, newJson) {
 }
 
 module.exports = JsonToYamlPreserveComments
-  
