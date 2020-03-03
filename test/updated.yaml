@@ -1,0 +1,37 @@
+flowName: introduction
+firstStep: start
+steps:
+  # First step, say hello
+  start:
+    say:
+      - Hello!
+      - Hope you are having a nice day
+      - What "is" your gender? # Ask user their gender
+    choices:
+      # Offer user two button choices, [Male] or [Female]
+      - Male
+      - Female
+      - Other
+    responseMapping:
+      # Based on the user's response jump to man_response, or woman_response
+      male: man_response # testing comment
+      female: woman_response
+      other: other_response
+  man_response:
+    say:
+      # Acknowledge man
+      - 'Ok, you''re a man'
+    nextStep: goodbye # jump to goodbye
+  woman_response:
+    say:
+      # Acknowledge woman
+      - 'Ok, you''re a woman'
+    nextStep: goodbye # jump to goodbye
+  # Say goodbye:
+  other_response:
+    say:
+      - 'Ok, you''re a other'
+    nextStep: goodbye
+  goodbye:
+    say:
+      - Goodbye!
