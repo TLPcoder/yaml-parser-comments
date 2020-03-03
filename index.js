@@ -1,12 +1,11 @@
 const fs = require('fs')
 const YAML = require('js-yaml');
 
-const readFile = (path, encoding = 'utf8') => fs.readFileSync(__dirname + path, encoding)
-const writeFile = (path, data, encoding = 'utf8') => fs.writeFileSync(__dirname + path, data, encoding)
 const isComment = (str) => str.trim().startsWith('#') 
 const isCommentInData = (str) => str.trim().replace(/#.*/, '').length > 0 ? true : false
 const containsComment = (line, comment) => line.includes(comment)
 const normPath = (p) => p.replace(/#.*\n/, '\n').replace(/"/g, '').trimRight()
+const parse = (s) => typeof s === 'object' ? s : JSON.parse(s)
 
 function findComments(yaml) {
   const comments = []
@@ -180,13 +179,10 @@ function update(yaml, pathComments) {
 
 function JsonToYamlPreserveComments(originalYaml, newJson) {
   const pathComments = pathToComment(originalYaml)
-  const yaml = YAML.safeDump(newJson)
+  const yaml = YAML.safeDump(parse(newJson))
 
-  writeFile('/newYaml.yaml', update(yaml, pathComments))
+  return update(yaml, pathComments)
 }
 
-const yaml = readFile('/original.yaml') 
-const json = readFile('/edited.json')
-
-JsonToYamlPreserveComments(yaml, JSON.parse(json))
+module.exports = JsonToYamlPreserveComments
   
